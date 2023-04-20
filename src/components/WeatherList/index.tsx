@@ -1,36 +1,22 @@
 /** @format */
 
 import React, { useState, useEffect, useRef, MouseEvent } from "react"
-import Weather from "../Weather/index"
+import DisplayBox, { WeatherDisplayProps } from "../DisplayBox/index"
+import { APIProps } from "../../utils/api"
 
-export interface WeatherProps {
-  value: number
+export interface WeatherListProps {
+  data: APIProps | undefined
 }
 
-export interface LocationProps {
-  data: WeatherProps
-}
-
-const WeatherList = () => {
-  const [weatherList, setWeatherList] = useState<Array<WeatherProps>>([])
+export const WeatherList = ({ data }: WeatherListProps) => {
+  const [weatherList, setWeatherList] = useState<Array<APIProps | undefined>>()
   const [initPos, setInitPos] = useState<number>(0)
   const [percentage, setPercentage] = useState<number>(0)
   const [prevPercentage, setPrevPercentage] = useState<number>(0)
   const track = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    setWeatherList([
-      { value: 0 },
-      { value: 1 },
-      { value: 2 },
-      { value: 3 },
-      { value: 4 },
-      { value: 5 },
-      { value: 6 },
-      { value: 7 },
-      { value: 8 },
-      { value: 9 },
-    ])
+    setWeatherList([data, data, data, data, data, data, data, data, data])
   }, [])
 
   const handleMouseDown = (e: any) => {
@@ -58,7 +44,7 @@ const WeatherList = () => {
         track.current.dataset.prevPercentage
       ) {
         const delta = parseFloat(track.current.dataset.mouseDownPos) - e.clientX
-        const maxDistance = window.innerWidth / 2
+        const maxDistance = window.innerWidth * 0.75
         const percent = (delta / maxDistance) * -100
         const percentUnconstrained =
           percent + parseFloat(track.current.dataset.prevPercentage)
@@ -71,7 +57,7 @@ const WeatherList = () => {
         if (track.current) {
           track.current.animate(
             { transform: `translate(${percentConstrained}%, 20%)` },
-            { duration: 1200, fill: "forwards" }
+            { duration: 7000, fill: "forwards" }
           )
         }
       }
@@ -93,9 +79,10 @@ const WeatherList = () => {
       data-prevpercentage='0'
       className='flex h-[21rem] sm:h-[30rem] gap-x-[4rem] left-1/2 translate-y-[20%] translate-x-[45.6%]'
     >
-      {weatherList.map((location: WeatherProps, index: number) => (
-        <Weather key={index} data={location} />
-      ))}
+      {weatherList &&
+        weatherList.map((data: APIProps | undefined, index: number) => (
+          <DisplayBox key={index} data={data} />
+        ))}
     </div>
   )
 }
