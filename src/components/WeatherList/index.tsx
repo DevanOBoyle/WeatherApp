@@ -1,22 +1,19 @@
 /** @format */
 
 import React, { useState, useEffect, useRef, MouseEvent } from "react"
-import DisplayBox, { WeatherDisplayProps } from "../DisplayBox/index"
-import { APIProps } from "../../utils/api"
+import { atom, useAtom } from "jotai"
+import DisplayBox from "../DisplayBox/index"
+import { weatherListAtom } from "../../App"
 
-export interface WeatherListProps {
-  data: APIProps | undefined
-}
-
-export const WeatherList = ({ data }: WeatherListProps) => {
-  const [weatherList, setWeatherList] = useState<Array<APIProps | undefined>>()
+export const WeatherList = (data: any) => {
+  const [weatherList, setWeatherList] = useAtom(weatherListAtom)
   const [initPos, setInitPos] = useState<number>(0)
   const [percentage, setPercentage] = useState<number>(0)
   const [prevPercentage, setPrevPercentage] = useState<number>(0)
   const track = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    setWeatherList([data, data, data, data, data, data, data, data, data])
+    setWeatherList([data])
   }, [])
 
   const handleMouseDown = (e: any) => {
@@ -64,6 +61,12 @@ export const WeatherList = ({ data }: WeatherListProps) => {
     }
   }
 
+  const handleClick = () => {
+    if (weatherList.length < 10) {
+      setWeatherList([{}].concat(weatherList))
+    }
+  }
+
   window.onmousedown = e => handleMouseDown(e)
   window.ontouchstart = e => handleMouseDown(e.touches[0])
   window.onmouseup = e => handleMouseUp(e)
@@ -77,12 +80,18 @@ export const WeatherList = ({ data }: WeatherListProps) => {
       style={{}}
       data-mousedownpos='0'
       data-prevpercentage='0'
-      className='flex h-[21rem] sm:h-[30rem] gap-x-[4rem] left-1/2 translate-y-[20%] translate-x-[45.6%]'
+      className='flex h-[21rem] sm:h-[30rem] gap-x-[4rem] left-1/2 translate-y-[20%] translate-x-[45.6%] items-center'
     >
       {weatherList &&
-        weatherList.map((data: APIProps | undefined, index: number) => (
+        weatherList.map((data: any, index: number) => (
           <DisplayBox key={index} data={data} />
         ))}
+      <div
+        onClick={() => {
+          handleClick()
+        }}
+        className='h-[8rem] w-[8rem] rounded-full bg-gray-900 '
+      ></div>
     </div>
   )
 }
